@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Directo Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Script para el selector de Emojis -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1/index.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        whatsapp: {
+                            DEFAULT: '#25D366',
+                            dark: '#128C7E',
+                            darker: '#075E54',
+                            light: '#DCF8C6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; 
+        }
+        
+        .btn-hover-effect {
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-hover-effect:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(37, 211, 102, 0.4), 0 4px 6px -2px rgba(37, 211, 102, 0.2);
+        }
+        
+        /* Scrollbars personalizados */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* Ocultar flechas de inputs numéricos */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* Ajustes para el Emoji Picker */
+        emoji-picker {
+            width: 100%;
+            max-width: 350px;
+            height: 300px;
+            --background: #ffffff;
+            --border-color: #e2e8f0;
+            --indicator-color: #25D366;
+            --button-hover-background: #f1f5f9;
+        }
+
+        /* Clases para alineación del texto en el textarea */
+        .align-left { text-align: left; }
+        .align-center { text-align: center; }
+        .align-right { text-align: right; }
+        .align-justify { text-align: justify; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Contenedor principal flex para poner las dos columnas lado a lado -->
+    <div class="flex flex-col lg:flex-row gap-6 w-full max-w-5xl items-start justify-center">
+
+        <!-- COLUMNA IZQUIERDA: Formulario Principal -->
+        <main class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-visible border border-gray-100 relative shrink-0">
+            
+            <!-- Header -->
+            <header class="bg-whatsapp-dark text-white p-6 text-center rounded-t-2xl relative z-10">
+                <div class="flex justify-center mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                        <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21"></path>
+                        <path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1"></path>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold tracking-tight">WhatsApp Directo</h1>
+                <p class="text-whatsapp-light text-sm mt-1 opacity-90">Versión Empresa</p>
+            </header>
+
+            <!-- Formulario -->
+            <div class="p-6 space-y-6 relative z-10 bg-white rounded-b-2xl">
+                
+                <form id="whatsappForm" onsubmit="prepararYEnviar(event)" class="space-y-5">
+                    
+                    <!-- Sección de Número de Teléfono -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700" for="telefonoLocal">
+                            Número de Destino <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex rounded-lg shadow-sm border border-gray-300 focus-within:border-whatsapp focus-within:ring-1 focus-within:ring-whatsapp transition-colors">
+                            
+                            <div class="relative flex items-center bg-gray-50 border-r border-gray-300 rounded-l-lg overflow-hidden">
+                                <span class="pl-3 pr-1 text-gray-500 pointer-events-none absolute font-medium">+</span>
+                                <input 
+                                    type="number" 
+                                    id="codigoArea" 
+                                    name="codigoArea" 
+                                    value="595" 
+                                    class="w-16 sm:w-20 pl-7 pr-2 py-3 bg-transparent text-gray-800 focus:outline-none focus:ring-0 text-sm font-medium"
+                                    title="Código de país"
+                                    required
+                                >
+                            </div>
+                            
+                            <input 
+                                type="tel" 
+                                id="telefonoLocal" 
+                                name="telefonoLocal" 
+                                placeholder="981 123 456" 
+                                class="flex-1 min-w-0 block w-full px-4 py-3 rounded-none rounded-r-lg focus:outline-none focus:ring-0 text-gray-900 placeholder-gray-400 text-lg tracking-wide"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Sección del Mensaje con Toolbar -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 flex justify-between items-center" for="mensaje">
+                            <span>Mensaje</span>
+                        </label>
+                        
+                        <div class="relative border border-gray-300 rounded-lg focus-within:border-whatsapp focus-within:ring-1 focus-within:ring-whatsapp transition-colors bg-white shadow-sm flex flex-col">
+                            
+                            <!-- Toolbar Superior (Formato y Alineación) -->
+                            <div class="flex flex-wrap items-center px-2 py-2 bg-gray-50 border-b border-gray-200 rounded-t-lg gap-1">
+                                <!-- Botones de formato -->
+                                <button type="button" onclick="formatText('*')" class="p-1.5 text-gray-600 hover:text-black hover:bg-gray-200 rounded transition-colors font-bold w-8 h-8 flex items-center justify-center" title="Negrita (*texto*)">B</button>
+                                <button type="button" onclick="formatText('_')" class="p-1.5 text-gray-600 hover:text-black hover:bg-gray-200 rounded transition-colors italic w-8 h-8 flex items-center justify-center font-serif" title="Cursiva (_texto_)">I</button>
+                                <button type="button" onclick="formatText('~')" class="p-1.5 text-gray-600 hover:text-black hover:bg-gray-200 rounded transition-colors line-through w-8 h-8 flex items-center justify-center" title="Tachado (~texto~)">S</button>
+
+                                <div class="w-px h-5 bg-gray-300 mx-1"></div>
+
+                                <!-- Botones de Alineación -->
+                                <button type="button" onclick="setAlign('left')" id="btnAlignLeft" class="align-btn p-1.5 text-gray-400 hover:text-black hover:bg-gray-200 rounded transition-colors w-8 h-8 flex items-center justify-center" title="Alinear a la izquierda">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="15" y1="12" x2="3" y2="12"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
+                                </button>
+                                <button type="button" onclick="setAlign('center')" id="btnAlignCenter" class="align-btn p-1.5 text-black bg-gray-200 rounded transition-colors w-8 h-8 flex items-center justify-center" title="Centrar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="6"></line><line x1="21" y1="12" x2="3" y2="12"></line><line x1="18" y1="18" x2="6" y2="18"></line></svg>
+                                </button>
+                                <button type="button" onclick="setAlign('right')" id="btnAlignRight" class="align-btn p-1.5 text-gray-400 hover:text-black hover:bg-gray-200 rounded transition-colors w-8 h-8 flex items-center justify-center" title="Alinear a la derecha">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="12" x2="9" y2="12"></line><line x1="21" y1="18" x2="7" y2="18"></line></svg>
+                                </button>
+                                <button type="button" onclick="setAlign('justify')" id="btnAlignJustify" class="align-btn p-1.5 text-gray-400 hover:text-black hover:bg-gray-200 rounded transition-colors w-8 h-8 flex items-center justify-center" title="Justificar texto">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="12" x2="3" y2="12"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg>
+                                </button>
+                            </div>
+
+                            <!-- Textarea -->
+                            <textarea 
+                                id="mensaje" 
+                                name="mensaje" 
+                                rows="5" 
+                                class="block w-full border-0 px-4 py-4 text-gray-800 align-center text-lg leading-relaxed focus:ring-0 focus:outline-none transition-colors resize-y min-h-[120px] placeholder-gray-300"
+                                placeholder="Escribe tu mensaje aquí..."
+                            ></textarea>
+
+                            <!-- Toolbar Inferior (Insertar y Limpiar) -->
+                            <div class="flex items-center justify-between px-2 py-2 bg-gray-50 border-t border-gray-200 rounded-b-lg gap-2">
+                                <div class="flex items-center gap-1">
+                                    <button type="button" id="btnEmoji" class="p-1.5 text-gray-500 hover:text-whatsapp hover:bg-gray-200 rounded transition-colors relative flex items-center gap-1 text-sm font-medium" title="Insertar Emoji">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+                                        Emoji
+                                    </button>
+
+                                    <button type="button" id="btnLink" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-gray-200 rounded transition-colors flex items-center gap-1 text-sm font-medium" title="Insertar Enlace">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                                        Link
+                                    </button>
+                                </div>
+
+                                <button type="button" id="btnLimpiar" class="p-1.5 px-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors flex items-center gap-1 text-xs font-medium" title="Borrar todo el texto">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    Limpiar
+                                </button>
+                            </div>
+
+                            <!-- Emoji Picker Principal -->
+                            <div id="emojiPickerContainer" class="hidden absolute bottom-12 left-0 mb-2 z-50 shadow-2xl rounded-lg overflow-hidden border border-gray-200">
+                                <emoji-picker class="light"></emoji-picker>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="error-message" class="hidden rounded-md bg-red-50 p-3 text-sm text-red-700 border border-red-200">
+                        <p class="flex items-center gap-2">
+                            <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                            Por favor, ingresa un número de teléfono válido.
+                        </p>
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        class="btn-hover-effect mt-2 w-full flex items-center justify-center gap-2 rounded-xl bg-whatsapp px-4 py-3.5 text-base font-semibold text-white shadow-md hover:bg-whatsapp-dark focus:outline-none focus:ring-2 focus:ring-whatsapp focus:ring-offset-2"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                        Enviar WhatsApp
+                    </button>
+                    
+                </form>
+            </div>
+        </main>
+
+        <!-- COLUMNA DERECHA: Plantillas de Mensajes -->
+        <aside class="bg-white rounded-2xl shadow-xl w-full lg:w-80 border border-gray-100 flex flex-col h-full lg:max-h-[600px]">
+            <div class="p-4 bg-gray-50 border-b border-gray-200 rounded-t-2xl flex justify-between items-center">
+                <h2 class="font-bold text-gray-800 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-whatsapp-dark"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    Plantillas Rápidas
+                </h2>
+                <!-- Al llamar a abrirModalNuevaPlantilla sin ID, sabe que es una nueva -->
+                <button onclick="abrirModalNuevaPlantilla()" class="text-xs bg-whatsapp-light text-whatsapp-darker hover:bg-whatsapp hover:text-white px-2 py-1 rounded transition-colors font-semibold">
+                    + Nueva
+                </button>
+            </div>
+            
+            <div class="p-4 overflow-y-auto flex-1 space-y-3" id="listaPlantillas">
+                <div class="text-center text-gray-400 text-sm py-4 italic" id="emptyStatePlantillas">
+                    No tienes plantillas guardadas.<br>Haz clic en "+ Nueva" para crear una.
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Modal (Ventana flotante) para agregar/editar plantilla -->
+    <div id="modalNuevaPlantilla" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[95vh]">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
+                <h3 id="modalPlantillaTitle" class="font-bold text-gray-800">Crear Nueva Plantilla</h3>
+                <button onclick="cerrarModalPlantilla()" class="text-gray-400 hover:text-red-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="p-5 space-y-4 overflow-y-auto">
+                <!-- Input Oculto para saber si estamos editando -->
+                <input type="hidden" id="plantillaIdActual" value="">
+                
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Título (Ej: Saludo, Cobro)</label>
+                    <input type="text" id="plantillaTitulo" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-whatsapp focus:ring-1 focus:ring-whatsapp outline-none" placeholder="Nombre corto...">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Texto del Mensaje</label>
+                    
+                    <div class="relative border border-gray-300 rounded-lg focus-within:border-whatsapp focus-within:ring-1 focus-within:ring-whatsapp transition-colors bg-white shadow-sm flex flex-col">
+                        
+                        <!-- Toolbar Superior Modal -->
+                        <div class="flex flex-wrap items-center px-2 py-2 bg-gray-50 border-b border-gray-200 rounded-t-lg gap-1">
+                            <button type="button" onclick="formatText('*', 'plantillaTexto')" class="p-1.5 text-gray-600 hover:text-black hover:bg-gray-200 rounded transition-colors font-bold w-8 h-8 flex items-center justify-center" title="Negrita">B</button>
+                            <button type="button" onclick="formatText('_', 'plantillaTexto')" class="p-1.5 text-gray-600 hover:text-black hover:bg-gray-200 rounded transition-colors italic w-8 h-8 flex items-center justify-center font-serif" title="Cursiva">I</button>
+                            <button type="button" onclick="formatText('~', 'plantillaTexto')" class="p-1.5 text-gray-600 hover:text-black hover:bg-gray-200 rounded transition-colors line-through w-8 h-8 flex items-center justify-center" title="Tachado">S</button>
+
+                            <div class="w-px h-5 bg-gray-300 mx-1"></div>
+
+                            <button type="button" onclick="setAlign('left', true)" id="btnAlignLeftModal" class="align-btn p-1.5 text-black bg-gray-200 rounded transition-colors w-8 h-8 flex items-center justify-center" title="Alinear a la izquierda">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="15" y1="12" x2="3" y2="12"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg>
+                            </button>
+                            <button type="button" onclick="setAlign('center', true)" id="btnAlignCenterModal" class="align-btn p-1.5 text-gray-400 hover:text-black hover:bg-gray-200 rounded transition-colors w-8 h-8 flex items-center justify-center" title="Centrar">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="6"></line><line x1="21" y1="12" x2="3" y2="12"></line><line x1="18" y1="18" x2="6" y2="18"></line></svg>
+                            </button>
+                            <button type="button" onclick="setAlign('right', true)" id="btnAlignRightModal" class="align-btn p-1.5 text-gray-400 hover:text-black hover:bg-gray-200 rounded transition-colors w-8 h-8 flex items-center justify-center" title="Alinear a la derecha">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="12" x2="9" y2="12"></line><line x1="21" y1="18" x2="7" y2="18"></line></svg>
+                            </button>
+                            <button type="button" onclick="setAlign('justify', true)" id="btnAlignJustifyModal" class="align-btn p-1.5 text-gray-400 hover:text-black hover:bg-gray-200 rounded transition-colors w-8 h-8 flex items-center justify-center" title="Justificar texto">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="12" x2="3" y2="12"></line><line x1="21" y1="18" x2="3" y2="18"></line></svg>
+                            </button>
+                        </div>
+                        
+                        <textarea id="plantillaTexto" rows="5" class="w-full border-0 px-4 py-3 text-sm focus:ring-0 outline-none resize-none align-left min-h-[140px] placeholder-gray-400" placeholder="Escribe el texto de tu nueva plantilla aquí..."></textarea>
+                        
+                        <!-- Toolbar Inferior Modal -->
+                        <div class="flex items-center px-2 py-2 bg-gray-50 border-t border-gray-200 rounded-b-lg gap-2">
+                            <button type="button" id="btnEmojiModal" class="p-1.5 text-gray-500 hover:text-whatsapp hover:bg-gray-200 rounded transition-colors relative flex items-center gap-1 text-xs font-medium" title="Insertar Emoji">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+                                Emoji
+                            </button>
+                            <button type="button" id="btnLinkModal" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-gray-200 rounded transition-colors flex items-center gap-1 text-xs font-medium" title="Insertar Enlace">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                                Link
+                            </button>
+                        </div>
+                        
+                        <!-- Emoji Picker Modal -->
+                        <div id="emojiPickerContainerModal" class="hidden absolute bottom-12 left-0 mb-2 z-[60] shadow-2xl rounded-lg overflow-hidden border border-gray-200">
+                            <emoji-picker class="light"></emoji-picker>
+                        </div>
+                    </div>
+                </div>
+                <!-- Botón de guardar dinámico (Guardar o Actualizar) -->
+                <button onclick="guardarPlantilla()" id="btnGuardarPlantilla" class="w-full bg-gray-800 text-white font-medium py-3 rounded-lg hover:bg-black transition-colors text-sm mt-2">
+                    Guardar Plantilla
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const textarea = document.getElementById('mensaje');
+        const btnLimpiar = document.getElementById('btnLimpiar');
+        const btnEmoji = document.getElementById('btnEmoji');
+        const btnLink = document.getElementById('btnLink');
+        const emojiPickerContainer = document.getElementById('emojiPickerContainer');
+        const picker = document.querySelector('#emojiPickerContainer emoji-picker');
+        
+        // Elementos Modal Plantilla
+        const btnEmojiModal = document.getElementById('btnEmojiModal');
+        const btnLinkModal = document.getElementById('btnLinkModal');
+        const emojiPickerContainerModal = document.getElementById('emojiPickerContainerModal');
+        const pickerModal = document.querySelector('#emojiPickerContainerModal emoji-picker');
+        const modalPlantilla = document.getElementById('modalNuevaPlantilla');
+        const modalPlantillaTitle = document.getElementById('modalPlantillaTitle');
+        const inputPlantillaIdActual = document.getElementById('plantillaIdActual');
+        const btnGuardarPlantilla = document.getElementById('btnGuardarPlantilla');
+        const inputPlantillaTitulo = document.getElementById('plantillaTitulo');
+        const inputPlantillaTexto = document.getElementById('plantillaTexto');
+
+        // Elementos de Plantillas
+        const listaPlantillas = document.getElementById('listaPlantillas');
+        const emptyStatePlantillas = document.getElementById('emptyStatePlantillas');
+        
+        let plantillasGuardadas = JSON.parse(localStorage.getItem('whatsappPlantillas')) || [
+            { id: 1, titulo: "👋 Saludo Inicial", texto: "¡Hola! ¿Cómo estás? Te escribo de parte de *[Nombre de tu Empresa]*." },
+            { id: 2, titulo: "🏦 Datos Bancarios", texto: "Te dejo nuestros datos para la transferencia:\n\nBanco: XYZ\nCuenta: 123456789\nTitular: Mi Empresa S.A." }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderizarPlantillas();
+        });
+
+        function setAlign(alignment, isModal = false) {
+            const targetId = isModal ? 'plantillaTexto' : 'mensaje';
+            const target = document.getElementById(targetId);
+            
+            target.classList.remove('align-left', 'align-center', 'align-right', 'align-justify');
+            target.classList.add(`align-${alignment}`);
+
+            const suffix = isModal ? 'Modal' : '';
+            const btnLeft = document.getElementById('btnAlignLeft' + suffix);
+            const btnCenter = document.getElementById('btnAlignCenter' + suffix);
+            const btnRight = document.getElementById('btnAlignRight' + suffix);
+            const btnJustify = document.getElementById('btnAlignJustify' + suffix);
+
+            [btnLeft, btnCenter, btnRight, btnJustify].forEach(btn => {
+                if(btn) {
+                    btn.classList.remove('text-black', 'bg-gray-200');
+                    btn.classList.add('text-gray-400');
+                }
+            });
+
+            let activeBtn;
+            if(alignment === 'left') activeBtn = btnLeft;
+            if(alignment === 'center') activeBtn = btnCenter;
+            if(alignment === 'right') activeBtn = btnRight;
+            if(alignment === 'justify') activeBtn = btnJustify;
+            
+            if(activeBtn) {
+                activeBtn.classList.remove('text-gray-400');
+                activeBtn.classList.add('text-black', 'bg-gray-200');
+            }
+            
+            target.focus();
+        }
+
+        btnLimpiar.addEventListener('click', () => {
+            if(confirm("¿Seguro que deseas limpiar el mensaje?")) {
+                textarea.value = '';
+                textarea.focus();
+            }
+        });
+
+        btnEmoji.addEventListener('click', (e) => {
+            e.stopPropagation();
+            emojiPickerContainer.classList.toggle('hidden');
+        });
+        
+        btnEmojiModal.addEventListener('click', (e) => {
+            e.stopPropagation();
+            emojiPickerContainerModal.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!emojiPickerContainer.contains(e.target) && !btnEmoji.contains(e.target)) {
+                emojiPickerContainer.classList.add('hidden');
+            }
+            if (!emojiPickerContainerModal.contains(e.target) && !btnEmojiModal.contains(e.target)) {
+                emojiPickerContainerModal.classList.add('hidden');
+            }
+        });
+
+        picker.addEventListener('emoji-click', event => insertAtCursor(event.detail.unicode, 'mensaje'));
+        pickerModal.addEventListener('emoji-click', event => insertAtCursor(event.detail.unicode, 'plantillaTexto'));
+
+        btnLink.addEventListener('click', () => crearLink('mensaje'));
+        btnLinkModal.addEventListener('click', () => crearLink('plantillaTexto'));
+        
+        function crearLink(targetId) {
+            const linkUrl = prompt("Por favor, ingresa el enlace (URL):", "https://");
+            if (linkUrl && linkUrl !== "https://") {
+                const linkText = prompt("Ingresa un texto descriptivo para el enlace (Opcional):", "");
+                if (linkText) {
+                    insertAtCursor(`${linkText}: ${linkUrl}`, targetId);
+                } else {
+                    insertAtCursor(linkUrl, targetId);
+                }
+            }
+        }
+
+        function formatText(char, targetId = 'mensaje') {
+            const target = document.getElementById(targetId);
+            const start = target.selectionStart;
+            const end = target.selectionEnd;
+            const text = target.value;
+            const selectedText = text.substring(start, end);
+
+            if (selectedText) {
+                const newText = text.substring(0, start) + char + selectedText + char + text.substring(end);
+                target.value = newText;
+                target.focus();
+                target.setSelectionRange(start, end + (char.length * 2));
+            } else {
+                insertAtCursor(char + char, targetId);
+                target.setSelectionRange(start + char.length, start + char.length);
+            }
+        }
+
+        function insertAtCursor(textToInsert, targetId = 'mensaje') {
+            const target = document.getElementById(targetId);
+            const cursorPosition = target.selectionStart;
+            const textBefore = target.value.substring(0, cursorPosition);
+            const textAfter = target.value.substring(target.selectionEnd);
+            
+            target.value = textBefore + textToInsert + textAfter;
+            
+            const newCursorPosition = cursorPosition + textToInsert.length;
+            target.setSelectionRange(newCursorPosition, newCursorPosition);
+            target.focus();
+        }
+
+        // Abre el modal para crear o editar
+        function abrirModalNuevaPlantilla(idToEdit = null) {
+            // Mostrar modal
+            modalPlantilla.classList.remove('hidden');
+            modalPlantilla.classList.add('flex');
+
+            if (idToEdit) {
+                // Modo Edición
+                const plantilla = plantillasGuardadas.find(p => p.id === idToEdit);
+                if (plantilla) {
+                    modalPlantillaTitle.textContent = "Editar Plantilla";
+                    inputPlantillaIdActual.value = plantilla.id;
+                    inputPlantillaTitulo.value = plantilla.titulo;
+                    inputPlantillaTexto.value = plantilla.texto;
+                    btnGuardarPlantilla.textContent = "Actualizar Plantilla";
+                }
+            } else {
+                // Modo Creación (Limpiar campos)
+                modalPlantillaTitle.textContent = "Crear Nueva Plantilla";
+                inputPlantillaIdActual.value = "";
+                inputPlantillaTitulo.value = "";
+                inputPlantillaTexto.value = "";
+                btnGuardarPlantilla.textContent = "Guardar Plantilla";
+            }
+        }
+
+        function cerrarModalPlantilla() {
+            modalPlantilla.classList.add('hidden');
+            modalPlantilla.classList.remove('flex');
+        }
+
+        function guardarPlantilla() {
+            const titulo = inputPlantillaTitulo.value.trim();
+            const texto = inputPlantillaTexto.value.trim();
+            const idActual = inputPlantillaIdActual.value;
+
+            if(!titulo || !texto) {
+                alert("Por favor completa el título y el texto.");
+                return;
+            }
+
+            if (idActual) {
+                // Actualizar existente
+                const index = plantillasGuardadas.findIndex(p => p.id === parseInt(idActual));
+                if (index !== -1) {
+                    plantillasGuardadas[index].titulo = titulo;
+                    plantillasGuardadas[index].texto = texto;
+                }
+            } else {
+                // Crear nueva
+                const nuevaPlantilla = {
+                    id: Date.now(),
+                    titulo: titulo,
+                    texto: texto
+                };
+                plantillasGuardadas.push(nuevaPlantilla);
+            }
+
+            localStorage.setItem('whatsappPlantillas', JSON.stringify(plantillasGuardadas));
+            cerrarModalPlantilla();
+            renderizarPlantillas();
+        }
+
+        function eliminarPlantilla(event, id) {
+            event.stopPropagation(); // Evita que se dispare el evento "usarPlantilla"
+            if(confirm("¿Seguro que deseas borrar esta plantilla?")) {
+                plantillasGuardadas = plantillasGuardadas.filter(p => p.id !== id);
+                localStorage.setItem('whatsappPlantillas', JSON.stringify(plantillasGuardadas));
+                renderizarPlantillas();
+            }
+        }
+
+        function usarPlantilla(textoPlantilla) {
+            insertAtCursor(textoPlantilla);
+            textarea.classList.add('ring-2', 'ring-whatsapp', 'bg-whatsapp-light', 'bg-opacity-10');
+            setTimeout(() => {
+                textarea.classList.remove('ring-2', 'ring-whatsapp', 'bg-whatsapp-light', 'bg-opacity-10');
+            }, 300);
+        }
+
+        function renderizarPlantillas() {
+            listaPlantillas.innerHTML = '';
+            
+            if(plantillasGuardadas.length === 0) {
+                emptyStatePlantillas.style.display = 'block';
+                listaPlantillas.appendChild(emptyStatePlantillas);
+                return;
+            }
+
+            emptyStatePlantillas.style.display = 'none';
+
+            plantillasGuardadas.forEach(plantilla => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-3 rounded-lg shadow-sm border border-gray-100 hover:border-whatsapp hover:shadow-md transition-all group relative cursor-pointer";
+                
+                const previewText = plantilla.texto.length > 50 ? plantilla.texto.substring(0, 50) + '...' : plantilla.texto;
+
+                card.innerHTML = `
+                    <div onclick="usarPlantilla('${plantilla.texto.replace(/\n/g, '\\n').replace(/'/g, "\\'")}')" class="w-full pr-12">
+                        <h4 class="font-bold text-sm text-gray-800 mb-1">${plantilla.titulo}</h4>
+                        <p class="text-xs text-gray-500 whitespace-pre-line">${previewText}</p>
+                    </div>
+                    
+                    <!-- Botones de Acción (Editar y Eliminar) -->
+                    <div class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <!-- Botón Editar -->
+                        <button onclick="event.stopPropagation(); abrirModalNuevaPlantilla(${plantilla.id})" class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded" title="Editar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                        <!-- Botón Eliminar -->
+                        <button onclick="eliminarPlantilla(event, ${plantilla.id})" class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded" title="Eliminar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
+                `;
+                listaPlantillas.appendChild(card);
+            });
+        }
+
+        function prepararYEnviar(event) {
+            event.preventDefault();
+
+            const errorDiv = document.getElementById('error-message');
+            const inputCodigoArea = document.getElementById('codigoArea');
+            const inputTelefonoLocal = document.getElementById('telefonoLocal');
+
+            const codigoLimpio = inputCodigoArea.value.replace(/\D/g, '');
+            let telLimpio = inputTelefonoLocal.value.replace(/\D/g, '');
+            
+            if (telLimpio.startsWith('0')) {
+                telLimpio = telLimpio.substring(1);
+            }
+
+            if (!telLimpio || !codigoLimpio) {
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            errorDiv.classList.add('hidden');
+
+            const numeroCompleto = codigoLimpio + telLimpio;
+            const textoMensaje = textarea.value;
+            
+            let whatsappUrl = `https://wa.me/${numeroCompleto}`;
+
+            if (textoMensaje.trim() !== '') {
+                const mensajeCodificado = encodeURIComponent(textoMensaje);
+                whatsappUrl += `?text=${mensajeCodificado}`;
+            }
+
+            emojiPickerContainer.classList.add('hidden');
+            window.open(whatsappUrl, '_blank');
+        }
+    </script>
+</body>
+</html>
